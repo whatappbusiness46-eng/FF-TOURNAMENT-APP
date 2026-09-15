@@ -1,0 +1,24 @@
+{
+  "expo": {
+    "name": "ZyroX Arena",
+    "slug": "zyrox-arena",
+    "version": "1.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "splash": {
+      "resizeMode": "contain",
+      "backgroundColor": "#080b10",
+      "image": "./assets/zyrox-arena-logo.png"
+    },
+    "android": {
+      "package": "com.zyroxarena.app"
+    },
+    "ios": {
+      "bundleIdentifier": "com.zyroxarena.app"
+    },
+    "assetBundlePatterns": [
+      "assets/*"
+    ],
+    "owner": "rifat5656"
+  }
+}

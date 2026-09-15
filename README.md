@@ -1,41 +1,21 @@
-# ZyroX Arena — APK-ready Tournament App
+# ZyroX Arena — Final Complete Build
 
-This project contains the Expo mobile app plus an Express backend.
+This package contains the Expo mobile app and Node/Express backend.
 
-## What is included
-- Free Fire modes: BR, CS 4v4, Lone Wolf, Clash Squad, Headshot, Survival, Pro League
-- Ludo tournament section
-- Upcoming/Ongoing + Results tabs
-- Match cards with entry fee, prize, per-kill, seats and status
-- Participant join system with wallet deduction
-- Admin-created matches and manual Free Fire Room ID/password
-- Room ID/password released only after admin starts the match
-- 5-second real-time polling for match status, seats and balance
-- Admin result entry: rank, kills, prize; prizes credited to wallet
-- bKash/Nagad manual deposit verification
-- bKash/Nagad withdrawal requests
-- Referral code + configurable referral percentage
-- Leaderboard, statements, support, admin panel
-- 15 editable rules stored in backend
-- No hardcoded admin/JWT secrets
+## Included
+- Free Fire BR/CS/Lone Wolf/Clash Squad/Headshot/Survival/Pro League modes
+- Ludo
+- Match list, join flow, room release, results/prizes
+- bKash/Nagad deposit request + admin approval
+- Withdraw request + admin approval/refund
+- Wallet statements, referral, leaderboard, notifications
+- Admin match/settings/rules/deposit/withdraw/result controls
+- Expo SDK 54 dependency fixes and startup fallback
 
-## Important limitation
-The app cannot create an official Free Fire Custom Room automatically unless an official/authorized Free Fire API provides that capability. The admin creates the room in Free Fire and enters the Room ID + Password in ZyroX Arena. The app then controls participant access, room release, status and results.
-
-## APK build
-1. Upload the contents of this folder to the root of your GitHub repository.
-2. In Expo, open project **ZyroX Arena** and connect the GitHub repository.
-3. Add an Expo environment variable named `EXPO_PUBLIC_API_URL` containing your deployed backend URL, for example `https://your-api.onrender.com`.
-4. Build Android with the `preview` profile. `eas.json` is already configured to produce an APK.
-
-## Backend on Render
-The included `render.yaml` can create a Node web service from the `backend` folder. Render will generate `ADMIN_TOKEN` and `JWT_SECRET` automatically.
-After deployment, copy the backend service URL into Expo as `EXPO_PUBLIC_API_URL`.
-
-## Admin
-Open the Admin Panel inside the app and enter the `ADMIN_TOKEN` value from the backend environment variables.
-
-## Payment defaults
-bKash: 01742166737
-Nagad: 01730649062
-These are editable from Admin Panel.
+## Required once before going live
+1. Deploy `backend/` to an always-on server or a Render paid service.
+2. Set `ADMIN_TOKEN` and a strong `JWT_SECRET`.
+3. Configure persistent production storage/database; the included JSON store is suitable for testing/small MVP use, not a high-volume real-money production ledger.
+4. Set Expo preview environment variable `EXPO_PUBLIC_API_URL` to the deployed backend URL, then build the APK.
+5. bKash/Nagad automatic payment requires the merchant/API credentials issued by the provider. Without those, deposits are transaction-ID + admin approval.
+6. Free Fire custom rooms must be created by an authorized/admin account unless an official room-creation API is available.

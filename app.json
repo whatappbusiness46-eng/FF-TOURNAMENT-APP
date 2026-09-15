@@ -2,16 +2,22 @@
   "expo": {
     "name": "ZyroX Arena",
     "slug": "zyrox-arena",
-    "version": "1.1.0",
+    "version": "1.1.1",
     "orientation": "portrait",
     "userInterfaceStyle": "dark",
+    "icon": "./assets/zyrox-arena-icon.png",
     "splash": {
       "resizeMode": "contain",
       "backgroundColor": "#080b10",
       "image": "./assets/zyrox-arena-logo.png"
     },
     "android": {
-      "package": "com.zyroxarena.app"
+      "package": "com.zyroxarena.app",
+      "versionCode": 2,
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/zyrox-arena-icon.png",
+        "backgroundColor": "#080b10"
+      }
     },
     "ios": {
       "bundleIdentifier": "com.zyroxarena.app"

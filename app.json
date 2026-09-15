@@ -20,5 +20,10 @@
       "assets/*"
     ],
     "owner": "rifat5656"
+    "extra": {
+    "eas": {
+    "projectId": "6c8f983c-1253-48b7-a4f7-aac19716a33d"
+      }
+    }
   }
 }

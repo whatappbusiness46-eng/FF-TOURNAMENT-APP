@@ -13,7 +13,7 @@
     },
     "android": {
       "package": "com.zyroxarena.app",
-      "versionCode": 2,
+      "versionCode": 3,
       "adaptiveIcon": {
         "foregroundImage": "./assets/zyrox-arena-icon.png",
         "backgroundColor": "#080b10"

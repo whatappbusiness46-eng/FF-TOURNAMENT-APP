@@ -1,5 +1,7 @@
 {
-  "cli": {},
+  "cli": {
+    "appVersionSource": "remote"
+  },
   "build": {
     "preview": {
       "distribution": "internal",

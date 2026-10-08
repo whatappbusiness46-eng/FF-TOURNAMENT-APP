@@ -2,7 +2,7 @@
   "expo": {
     "name": "ZyroX Arena",
     "slug": "zyrox-arena",
-    "version": "1.2.3",
+    "version": "1.2.4",
     "orientation": "portrait",
     "userInterfaceStyle": "dark",
     "icon": "./assets/zyrox-arena-icon.png",
@@ -13,7 +13,7 @@
     },
     "android": {
       "package": "com.zyroxarena.mobile2026",
-      "versionCode": 3,
+      "versionCode": 4,
       "adaptiveIcon": {
         "foregroundImage": "./assets/zyrox-arena-icon.png",
         "backgroundColor": "#080b10"

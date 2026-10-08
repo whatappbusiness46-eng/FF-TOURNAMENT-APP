@@ -1,6 +1,6 @@
 {
   "name": "zyrox-arena-mobile",
-  "version": "1.2.3",
+  "version": "1.2.4",
   "private": true,
   "main": "expo/AppEntry.js",
   "scripts": {

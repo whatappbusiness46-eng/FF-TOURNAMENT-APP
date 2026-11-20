@@ -1,13 +1,7 @@
 services:
   - type: web
-    name: zyrox-arena-api
+    name: zyrox-arena-backend
     runtime: node
     rootDir: backend
     buildCommand: npm install
     startCommand: npm start
-    healthCheckPath: /api/health
-    envVars:
-      - key: ADMIN_TOKEN
-        generateValue: true
-      - key: JWT_SECRET
-        generateValue: true

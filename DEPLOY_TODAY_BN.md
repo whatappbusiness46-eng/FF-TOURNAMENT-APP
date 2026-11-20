@@ -44,3 +44,6 @@
 
 ## Secret Safety
 `ADMIN_TOKEN`, `JWT_SECRET`, database password বা payment credentials কখনো GitHub-এ commit করবেন না বা chat-এ পাঠাবেন না। শুধু Render Environment Variables-এ রাখবেন।
+
+## Data persistence (IMPORTANT)
+For Render, add a Persistent Disk (e.g. mount path `/var/data`) to the backend service and set environment variable `DATA_DIR=/var/data`. The backend stores `db.json` in that directory. Without this disk/path configuration, local JSON data may be lost during redeploy/restart. Back up `db.json` regularly. Persistent disk is single-instance storage; for scaling/multi-instance use a database.

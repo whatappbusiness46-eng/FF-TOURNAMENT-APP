@@ -82,6 +82,40 @@ function admin(req,res,next){if(!ADMIN_TOKEN||req.headers['x-admin-token']!==ADM
 function modeFor(id){return db.modes.find(m=>m.id===id);}
 function publicMatch(m){const copy={...m,players:undefined,rulesText:db.rulesText};copy.filled=(m.players||[]).length; if(m.status==='open') {copy.roomId='';copy.roomPassword='';} return copy;}
 function notify(text){db.notifications.push({id:id('n'),text,ts:Date.now()});db.notifications=db.notifications.slice(-100);}
+function rankRewardFor(rank, rule) {
+  const n = Number(rank);
+  if (!Number.isFinite(n) || n < 1) return 0;
+  const entries = rule && rule.rewards;
+  if (Array.isArray(entries)) {
+    for (const entry of entries) {
+      if (!entry || entry.amount == null) continue;
+      const label = String(entry.rank ?? entry.place ?? entry.position ?? '').trim();
+      const range = label.match(/^(\d+)\s*[-–]\s*(\d+)$/);
+      if (range) {
+        const a = Number(range[1]), b = Number(range[2]);
+        if (n >= Math.min(a,b) && n <= Math.max(a,b)) return Math.max(0, Number(entry.amount)||0);
+      } else if (Number(label) === n) return Math.max(0, Number(entry.amount)||0);
+    }
+  } else if (entries && typeof entries === 'object') {
+    for (const [label, amount] of Object.entries(entries)) {
+      const range = label.match(/^(\d+)\s*[-–]\s*(\d+)$/);
+      if (range && n >= Math.min(Number(range[1]),Number(range[2])) && n <= Math.max(Number(range[1]),Number(range[2]))) return Math.max(0,Number(amount)||0);
+      if (Number(label) === n) return Math.max(0,Number(amount)||0);
+    }
+  }
+  if (n === 1) return Math.max(0, Number(rule?.winnerReward)||0);
+  if (n === 2) return Math.max(0, Number(rule?.secondReward)||0);
+  return 0;
+}
+function calculateMatchResult(m, input) {
+  const rule = db.rules[m.modeId] || {};
+  const rank = Number(input.rank||0), kills = Number(input.kills||0);
+  if (!Number.isInteger(rank) || rank < 0 || !Number.isInteger(kills) || kills < 0) throw new Error('Rank and kills must be non-negative whole numbers');
+  const perKill = Math.max(0, Number(m.perKill != null ? m.perKill : rule.perKill)||0);
+  const killReward = kills * perKill;
+  const rankReward = rankRewardFor(rank, rule);
+  return {uid:String(input.uid), rank, kills, perKill, killReward, rankReward, prize:killReward+rankReward};
+}
 
 app.get('/api/health',(req,res)=>res.json({ok:true,app:'ZyroX Arena',time:new Date().toISOString()}));
 app.get('/api/public/config',(req,res)=>res.json({settings:db.settings,modes:db.modes,rules:db.rules,rulesText:db.rulesText}));
@@ -115,7 +149,7 @@ app.put('/api/admin/modes',admin,(req,res)=>{db.modes=Array.isArray(req.body)?re
 app.post('/api/admin/matches',admin,(req,res)=>{const modeId=String(req.body.modeId||'br');const r=db.rules[modeId]||{};const m={id:id('m'),title:String(req.body.title||`${modeFor(modeId)?.name||'MATCH'} #${db.matches.length+1}`),modeId,entryFee:Number(req.body.entryFee!=null?req.body.entryFee:(r.entryFee||0)),prize:Number(req.body.prize||0),perKill:Number(req.body.perKill!=null?req.body.perKill:(r.perKill||0)),maxPlayers:Number(req.body.maxPlayers||48),filled:0,players:[],startAt:String(req.body.startAt||''),roomId:String(req.body.roomId||''),roomPassword:String(req.body.roomPassword||''),status:'open',results:[],createdAt:Date.now()};db.matches.push(m);save(db);res.json(m);});
 app.patch('/api/admin/matches/:id',admin,(req,res)=>{const m=db.matches.find(x=>x.id===req.params.id);if(!m)return res.status(404).json({error:'Not found'});const allowed=['title','modeId','entryFee','prize','perKill','maxPlayers','startAt','roomId','roomPassword','status'];for(const k of allowed)if(req.body[k]!==undefined)m[k]=k==='maxPlayers'||k==='entryFee'||k==='prize'||k==='perKill'?Number(req.body[k]):String(req.body[k]);if(req.body.status==='started'&&!m.startedAt)m.startedAt=Date.now();if(req.body.status==='finished')m.finishedAt=Date.now();m.filled=m.players.length;save(db);res.json(m);});
 app.post('/api/admin/matches/:id/start',admin,(req,res)=>{const m=db.matches.find(x=>x.id===req.params.id);if(!m)return res.status(404).json({error:'Not found'});if(!m.roomId||!m.roomPassword)return res.status(400).json({error:'Add Room ID and Password before starting'});m.status='started';m.startedAt=Date.now();save(db);notify(`${m.title} has started. Room details are now available to joined players.`);save(db);res.json(m);});
-app.post('/api/admin/matches/:id/finish',admin,(req,res)=>{const m=db.matches.find(x=>x.id===req.params.id);if(!m)return res.status(404).json({error:'Not found'});if(m.status==='finished')return res.status(409).json({error:'Results have already been published'});if(m.status!=='started')return res.status(400).json({error:'Start the match before publishing results'});m.status='finished';m.finishedAt=Date.now();m.results=Array.isArray(req.body.results)?req.body.results.map(x=>({uid:String(x.uid),rank:Number(x.rank||0),kills:Number(x.kills||0),prize:Number(x.prize||0)})):m.results||[];for(const result of m.results){const u=userById(result.uid);if(!u)continue;const prize=Math.max(0,Number(result.prize||0));u.winnings=(u.winnings||0)+prize;if(prize>0){u.balance+=prize;db.statements.push({uid:u.id,type:'prize',amount:prize,note:`Prize: ${m.title}`,ts:Date.now()});}}save(db);notify(`${m.title} result published.`);save(db);res.json(m);});
+app.post('/api/admin/matches/:id/finish',admin,(req,res)=>{const m=db.matches.find(x=>x.id===req.params.id);if(!m)return res.status(404).json({error:'Not found'});if(m.status==='finished')return res.status(409).json({error:'Results have already been published'});if(m.status!=='started')return res.status(400).json({error:'Start the match before publishing results'});if(!Array.isArray(req.body.results))return res.status(400).json({error:'Results must be an array'});try{const seen=new Set();const participants=new Set(m.players||[]);const results=req.body.results.map(x=>{const uid=String(x.uid||'');if(!uid||!participants.has(uid))throw new Error('Every result UID must be a joined participant');if(seen.has(uid))throw new Error('Duplicate UID in results');seen.add(uid);return calculateMatchResult(m,x);});m.results=results;m.status='finished';m.finishedAt=Date.now();for(const result of m.results){const u=userById(result.uid);if(!u)continue;const prize=Math.max(0,Number(result.prize||0));u.winnings=(u.winnings||0)+prize;if(prize>0){u.balance+=prize;db.statements.push({uid:u.id,type:'prize',amount:prize,note:`Kill ৳${result.killReward} + Rank ৳${result.rankReward}: ${m.title}`,ts:Date.now()});}}save(db);notify(`${m.title} result published.`);save(db);res.json(m);}catch(e){return res.status(400).json({error:e.message||'Invalid result data'});}});
 app.post('/api/admin/deposits/:id/approve',admin,(req,res)=>{const d=db.deposits.find(x=>x.id===req.params.id);if(!d)return res.status(404).json({error:'Not found'});if(d.status!=='pending')return res.status(400).json({error:'Already processed'});d.status='approved';const u=userById(d.uid);u.balance+=d.amount;db.statements.push({uid:u.id,type:'deposit',amount:d.amount,note:`${d.method} deposit approved`,ts:Date.now()});save(db);res.json(d);});
 app.post('/api/admin/deposits/:id/reject',admin,(req,res)=>{const d=db.deposits.find(x=>x.id===req.params.id);if(!d)return res.status(404).json({error:'Not found'});if(d.status!=='pending')return res.status(409).json({error:'Deposit already processed'});d.status='rejected';save(db);res.json(d);});
 app.post('/api/admin/withdrawals/:id/approve',admin,(req,res)=>{const w=db.withdrawals.find(x=>x.id===req.params.id);if(!w)return res.status(404).json({error:'Not found'});if(w.status!=='pending')return res.status(409).json({error:'Withdrawal already processed'});w.status='approved';save(db);res.json(w);});

@@ -1,9 +1,16 @@
-# ZyroX Arena — এই ZIP-এ করা পরিবর্তন
+# ZyroX Arena patch (2026-11-20)
 
-- Finished match-এর result app-এর Match Details-এ দেখানোর UI যোগ হয়েছে (rank/name/kills/prize)।
-- Backend finished match-এর result-এ participant UID validation এবং non-negative numeric validation যোগ হয়েছে।
-- Public finished-match result-এ player name resolve করে পাঠায়; open match-এর result/room data গোপন থাকে।
+## Changes included
+- App registration/login endpoints for name, email, Bangladesh phone and password; password hashing uses Node's PBKDF2.
+- OTP verification is intentionally deferred as requested.
+- Admin editor allows modifying results after publication; backend adjusts previous prize credits against the new values.
+- Admin setting for logo image URL (the URL must be a publicly accessible image; it is not a direct image upload).
+- User password hash/salt are removed from /api/me and admin overview responses.
+- Removed the redundant nested update ZIP from the project folder.
 
-## গুরুত্বপূর্ণ সীমাবদ্ধতা / APK ও Deploy
-
-এই ZIP source update; এটি নিজে থেকে Render deploy বা APK build করে না। Backend Render-এ deploy করে তারপর Expo/EAS-এ build করতে হবে। OTP verification এখনো যুক্ত নয় (পরবর্তী কাজ হিসেবে রাখা হয়েছে)। Deposit/withdrawal বর্তমানে admin manual review flow; automatic bKash/Nagad payment integration নয়। Build/device test ও live-server test এখানে সম্পন্ন হয়নি।
+## Not verified / live setup still required
+- No device/APK test, EAS build, Render deployment, or live API test has been performed in this environment.
+- Set ADMIN_TOKEN and JWT_SECRET (long random secret) in Render; configure durable storage/DB. JSON-file storage is not production-safe on ephemeral hosting.
+- The app API URL must point at the actual deployed backend URL. The existing URL was retained rather than guessing.
+- Payments remain manual transaction-ID approval, not automated bKash/Nagad integration. OTP and password recovery are not implemented.
+- Admin logo setting accepts a URL; upload/storage hosting is not implemented.

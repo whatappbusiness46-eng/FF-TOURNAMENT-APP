@@ -4,7 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {Ionicons} from '@expo/vector-icons';
 import {LinearGradient} from 'expo-linear-gradient';
 
-const API=(process.env.EXPO_PUBLIC_API_URL||'').replace(/\/$/,'');
+const API='https://ff-tournament-app-1.onrender.com';
 const C={bg:'#080d15',panel:'#121a27',panel2:'#182437',line:'#2a3950',text:'#f7f9fc',muted:'#8e9aad',gold:'#ffca28',cyan:'#13c8dc',green:'#55d365',red:'#ff6371'};
 const logo=require('./assets/zyrox-arena-logo.png');
 const FALLBACK_CFG={settings:{appName:'ZyroX Arena',currency:'BDT',referralPercent:5,supportTelegram:'',bkashNumber:'01742166737',nagadNumber:'01730649062',bannerText:'PLAY • COMPETE • WIN'},modes:[{id:'br',name:'BR MATCH',game:'Free Fire',enabled:true},{id:'cs',name:'CS 4 VS 4',game:'Free Fire',enabled:true},{id:'lw',name:'LONE WOLF',game:'Free Fire',enabled:true},{id:'clash',name:'CLASH SQUAD',game:'Free Fire',enabled:true},{id:'headshot',name:'HEADSHOT',game:'Free Fire',enabled:true},{id:'survival',name:'SURVIVAL',game:'Free Fire',enabled:true},{id:'pro',name:'PRO LEAGUE',game:'Free Fire',enabled:true},{id:'ludo',name:'LUDO',game:'Ludo',enabled:true}],rules:{br:{entryFee:5,perKill:2.5,rewards:[{rank:'1',amount:50},{rank:'2',amount:30},{rank:'3',amount:20},{rank:'4-5',amount:10}]},cs:{entryFee:25,winnerReward:40,secondReward:0},lw:{entryFee:30,winnerReward:30},clash:{entryFee:25,winnerReward:40},headshot:{entryFee:10,perKill:5},survival:{entryFee:10,winnerReward:50},pro:{entryFee:20,winnerReward:100},ludo:{entryFee:10,winnerReward:18}},rulesText:[]};
